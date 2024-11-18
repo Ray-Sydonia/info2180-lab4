@@ -1,21 +1,38 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const searchButton = document.getElementById('searchButton'); 
-
+    const searchButton = document.getElementById('searchButton');
+    const divResult = document.getElementById('result');
+    const searchInput = document.getElementById('searchInput');
 
     searchButton.addEventListener('click', () => {
+        let query = searchInput.value.trim();
 
-        fetch('superheroes.php')
+        fetch(`superheroes.php?query=${encodeURIComponent(query)}`)
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('There was no Response');
+                    throw new Error('There has been no response');
                 }
                 return response.text();
             })
             .then(data => {
-                alert(`Superheroes: ${data}`);
+                divResult.innerHTML = "";
+
+                if (!data) {
+                    divResult.innerHTML = 'Superhero not found.';
+                } else {
+                    const sups = data.split('\n');
+
+                    sups.forEach(element => {
+                        const divSuper = document.createElement('div');
+                        divSuper.classList.add('element');
+
+                        divSuper.innerHTML = element.trim();
+                        divResult.appendChild(divSuper);
+                    });
+                }
             })
-            .catch(error   => {
-                console.error('There was a problem with the fetch operation:', error);
+            .catch(error => {
+                console.error('An error has occurred:', error);
+                divResult.innerHTML = 'There is no list found.';
             });
     });
 });
